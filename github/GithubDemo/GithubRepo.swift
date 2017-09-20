@@ -10,8 +10,8 @@ import Foundation
 import AFNetworking
 
 private let reposUrl = "https://api.github.com/search/repositories"
-private let clientId: String? = nil
-private let clientSecret: String? = nil
+private let clientId: String? = "051e2d50c6bf062af088"
+private let clientSecret: String? = "801b3fbd340b4aee866b1828f32743ea22c55231"
 
 // Model class that represents a GitHub repository
 class GithubRepo: CustomStringConvertible {
@@ -21,6 +21,7 @@ class GithubRepo: CustomStringConvertible {
     var ownerAvatarURL: String?
     var stars: Int?
     var forks: Int?
+    var repoDescription: String?
     
     // Initializes a GitHubRepo from a JSON dictionary
     init(jsonResult: NSDictionary) {
@@ -44,7 +45,12 @@ class GithubRepo: CustomStringConvertible {
                 self.ownerAvatarURL = ownerAvatarURL
             }
         }
+        
+        if let repoDescription = jsonResult["description"] as? String {
+            self.repoDescription = repoDescription
+        }
     }
+    
     
     // Actually fetch the list of repositories from the GitHub API.
     // Calls successCallback(...) if the request is successful
@@ -60,11 +66,11 @@ class GithubRepo: CustomStringConvertible {
                 }
                 successCallback(repos)
             }
-        }) { (operation: AFHTTPRequestOperation, requestError: Error) in
+        }, failure: { (operation: AFHTTPRequestOperation, requestError: Error) in
             if let errorCallback = error {
                 errorCallback(requestError)
             }
-        }
+        })
     }
     
     // Helper method that constructs a dictionary of the query parameters used in the request to the
@@ -98,6 +104,7 @@ class GithubRepo: CustomStringConvertible {
             "\n\t[Stars: \(self.stars!)]" +
             "\n\t[Forks: \(self.forks!)]" +
             "\n\t[Owner: \(self.ownerHandle!)]" +
-            "\n\t[Avatar: \(self.ownerAvatarURL!)]"
+            "\n\t[Avatar: \(self.ownerAvatarURL!)]" +
+            "\n\t[Description: \(self.repoDescription!)]"
     }
 }
